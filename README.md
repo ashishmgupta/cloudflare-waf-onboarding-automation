@@ -88,7 +88,10 @@ DYNATRACE_URL=https://your-environment-id.live.dynatrace.com/api/v2/logs/ingest?
 python setup_env.py
 ```
 
-- **Windows**: writes to `HKCU\Environment` in the registry (permanent for your user). Open a new terminal after running.
+- **Windows**: writes each credential to `HKCU\Environment` in the registry. This is the same location Windows itself uses to store user environment variables — it is not a shortcut or a hint, it is the actual persistent store. Any new terminal opened after this will automatically inherit the variables. The current terminal will not see them (it already loaded its own copy of the environment at startup). To verify the write worked without opening a new terminal, run:
+  ```powershell
+  [System.Environment]::GetEnvironmentVariable("CLOUDFLARE_API_TOKEN", "User")
+  ```
 - **macOS / Linux**: appends `export` statements to `~/.zshrc` or `~/.bash_profile`. Run `source ~/.zshrc` after running (or open a new terminal).
 
 ---
