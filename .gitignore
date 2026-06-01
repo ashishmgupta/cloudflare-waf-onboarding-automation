@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Allow only these file types
+!*.py
+!*.html
+!*.example
+!.gitignore

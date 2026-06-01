@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloudflare Zone Onboarding — Documentation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.65; }
+  .layout { display: flex; min-height: 100vh; }
+  nav { width: 260px; min-width: 260px; background: #010409; border-right: 1px solid #30363d; padding: 24px 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; }
+  nav h3 { color: #58a6ff; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 0 20px 8px; }
+  nav a { display: block; padding: 6px 20px; color: #8b949e; text-decoration: none; font-size: 0.85rem; border-left: 2px solid transparent; }
+  nav a:hover, nav a.active { color: #c9d1d9; border-left-color: #58a6ff; background: #161b22; }
+  nav .nav-section { margin-bottom: 20px; }
+  main { flex: 1; padding: 40px 48px; max-width: 960px; }
+  h1 { font-size: 2rem; color: #58a6ff; margin-bottom: 8px; }
+  h2 { font-size: 1.4rem; color: #e6edf3; margin: 48px 0 16px; padding-top: 16px; border-top: 1px solid #30363d; scroll-margin-top: 24px; }
+  h3 { font-size: 1.05rem; color: #79c0ff; margin: 28px 0 10px; }
+  p { margin-bottom: 14px; }
+  a { color: #58a6ff; }
+  code { background: #161b22; color: #ff7b72; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.88em; border: 1px solid #30363d; }
+  pre { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 18px; margin: 14px 0 20px; overflow-x: auto; font-family: 'Courier New', monospace; font-size: 0.83rem; line-height: 1.6; color: #a5d6ff; }
+  pre .comment { color: #8b949e; }
+  pre .key { color: #79c0ff; }
+  pre .string { color: #a5d6ff; }
+  pre .number { color: #f2cc60; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 0.88rem; }
+  th { background: #161b22; color: #8b949e; text-align: left; padding: 10px 14px; border: 1px solid #30363d; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  td { padding: 10px 14px; border: 1px solid #30363d; vertical-align: top; }
+  tr:nth-child(odd) td { background: #0d1117; }
+  tr:nth-child(even) td { background: #161b22; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: bold; }
+  .badge-edit { background: #1a3a1a; color: #3fb950; border: 1px solid #3fb950; }
+  .badge-read { background: #1a2a3a; color: #58a6ff; border: 1px solid #58a6ff; }
+  .callout { border-left: 4px solid; border-radius: 0 6px 6px 0; padding: 12px 16px; margin: 16px 0; }
+  .callout-warn { border-color: #e3b341; background: #2a2200; }
+  .callout-info { border-color: #58a6ff; background: #0a1628; }
+  .callout-danger { border-color: #ff4444; background: #2d0f0f; }
+  .callout-success { border-color: #3fb950; background: #0f2417; }
+  .callout strong { display: block; margin-bottom: 4px; }
+  .step-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 18px 20px; margin-bottom: 16px; }
+  .step-card .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .step-num { background: #1f3a5f; color: #58a6ff; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem; flex-shrink: 0; }
+  .step-title { font-weight: bold; color: #e6edf3; }
+  .step-endpoint { font-family: 'Courier New', monospace; font-size: 0.78rem; color: #79c0ff; background: #0d1117; padding: 4px 10px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+  .method { font-weight: bold; margin-right: 6px; }
+  .method-post { color: #3fb950; }
+  .method-patch { color: #e3b341; }
+  .method-put { color: #58a6ff; }
+  .method-delete { color: #ff4444; }
+  .subtitle { color: #8b949e; font-size: 0.9rem; margin-bottom: 16px; }
+  .toc-link { color: #58a6ff; font-size: 0.85rem; }
+  ul, ol { padding-left: 22px; margin-bottom: 14px; }
+  li { margin-bottom: 6px; }
+  .tag { font-family: 'Courier New', monospace; font-size: 0.78rem; background: #1f3a5f; color: #79c0ff; padding: 1px 7px; border-radius: 3px; }
+  .arch-diagram { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 24px; margin: 20px 0; font-family: 'Courier New', monospace; font-size: 0.82rem; line-height: 1.7; color: #8b949e; white-space: pre; overflow-x: auto; }
+  .arch-diagram .highlight { color: #58a6ff; }
+  .arch-diagram .arrow { color: #3fb950; }
+  hr { border: none; border-top: 1px solid #30363d; margin: 32px 0; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ── Sidebar nav ── -->
+<nav>
+  <div class="nav-section">
+    <h3>Documentation</h3>
+    <a href="#overview">1. Overview</a>
+    <a href="#prerequisites">2. Prerequisites</a>
+    <a href="#permissions">3. API Token Permissions</a>
+    <a href="#credentials">4. credentials.txt Format</a>
+    <a href="#usage">5. Script Usage</a>
+    <a href="#steps">6. Step-by-Step Walkthrough</a>
+    <a href="#rollback">7. Rollback Behaviour</a>
+    <a href="#report">8. HTML Report</a>
+    <a href="#limitations">9. Known Limitations</a>
+    <a href="#troubleshooting">10. Troubleshooting</a>
+  </div>
+</nav>
+
+<!-- ── Main content ── -->
+<main>
+
+<h1>Cloudflare Zone Onboarding Automation</h1>
+<p class="subtitle">Production-grade automation for Cloudflare Enterprise zone creation and WAF/logging configuration via the Cloudflare REST API v4.</p>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="overview">1. Overview</h2>
+
+<p>This script (<code>cloudflare_zone_setup.py</code>) fully automates the creation of a Cloudflare zone and the application of a standardised Enterprise security and logging configuration across 12 sequential steps. Every API call is verified, and any failure triggers automatic rollback with a full HTML diagnostic report.</p>
+
+<h3>What it does</h3>
+<ul>
+  <li>Creates a zone under your Cloudflare Enterprise account</li>
+  <li>Adds a proxied A or CNAME DNS record (required for WAF and all security features)</li>
+  <li>Applies security settings: TLS 1.2 minimum, HTTP/2 off, 120s origin timeout</li>
+  <li>Enables log retention (72-hour Logpull window)</li>
+  <li>Deploys the Cloudflare Managed WAF Ruleset in <strong>log mode</strong></li>
+  <li>Disables caching for all requests</li>
+  <li>Creates 4 Logpush jobs: HTTP requests, firewall events, and DNS logs to Splunk; HTTP requests to Dynatrace</li>
+  <li>Generates a full HTML report on completion (success or failure)</li>
+</ul>
+
+<h3>Architecture</h3>
+<div class="arch-diagram">
+<span class="highlight">cloudflare_zone_setup.py</span>
+        │
+        ├─── reads ──────────────────► <span class="highlight">credentials.txt</span>
+        │
+        │   <span class="arrow">POST /zones</span>
+        ├──────────────────────────► <span class="highlight">Cloudflare API v4</span>
+        │                                    │
+        │   Zone created                     │
+        │◄───────────────────────────────────┤
+        │                                    │
+        │   (12 sequential steps)            │
+        ├──────────────────────────────────► │
+        │                                    │
+        │   ┌─── Zone Settings               │
+        │   │    TLS 1.2 min                 │
+        │   │    HTTP/2 off                  │
+        │   │    Origin timeout 120s         │
+        │   │    Log retention on            │
+        │   │                                │
+        │   ├─── WAF                         │
+        │   │    Managed Rules (log mode)    │
+        │   │                                │
+        │   ├─── Cache Rules                 │
+        │   │    Disable all caching         │
+        │   │                                │
+        │   └─── Logpush Jobs (4 max)        │
+        │        HTTP → Splunk               │
+        │        Firewall → Splunk           │
+        │        DNS → Splunk                │
+        │        HTTP → Dynatrace            │
+        │                                    │
+        └─── generates ──────────────────► <span class="highlight">zone_report_{zone}_{ts}.html</span>
+</div>
+
+<div class="callout callout-warn">
+  <strong>⚠ Zone activation requires manual action</strong>
+  Creating a zone via the API does not activate it. You must update your domain registrar's nameservers to point to the Cloudflare nameservers assigned to the zone. Until this is done, DNS and all security features will not be active.
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="prerequisites">2. Prerequisites</h2>
+
+<h3>Account requirements</h3>
+<ul>
+  <li><strong>Cloudflare Enterprise account</strong> — required for <code>proxy_read_timeout</code> and Logpull entitlement</li>
+  <li>Enterprise plan must be pre-assigned by Cloudflare to your account — it cannot be set via API</li>
+</ul>
+
+<h3>System requirements</h3>
+<ul>
+  <li>Python 3.9 or later</li>
+  <li><code>requests</code> library: <code>pip install requests</code></li>
+</ul>
+
+<h3>Files required</h3>
+<ul>
+  <li><code>credentials.txt</code> — in the same directory as the script (see <a href="#credentials">Section 4</a>)</li>
+</ul>
+
+<h3>After the script runs (manual steps)</h3>
+<ol>
+  <li>Log in to the Cloudflare dashboard</li>
+  <li>Navigate to your zone → DNS → Nameservers</li>
+  <li>Note the assigned Cloudflare nameservers (e.g. <code>aria.ns.cloudflare.com</code>)</li>
+  <li>Update your domain registrar to use those nameservers</li>
+  <li>Wait for DNS propagation (can take up to 24 hours)</li>
+</ol>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="permissions">3. Cloudflare API Token Permissions</h2>
+
+<p>Create a <strong>Custom Token</strong> with exactly these permissions. Using a Global API Key is not recommended for production.</p>
+
+<table>
+  <thead>
+    <tr><th>Category</th><th>Permission</th><th>Access Level</th><th>Required For</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Zone</td><td>Zone</td><td><span class="badge badge-edit">Edit</span></td><td>Creating zones (Step 1)</td></tr>
+    <tr><td>Zone</td><td>DNS</td><td><span class="badge badge-edit">Edit</span></td><td>Creating A / CNAME records (Step 2)</td></tr>
+    <tr><td>Zone</td><td>Zone Settings</td><td><span class="badge badge-edit">Edit</span></td><td>TLS, HTTP/2, origin timeout, log retention (Steps 3–6)</td></tr>
+    <tr><td>Zone</td><td>Firewall Services</td><td><span class="badge badge-edit">Edit</span></td><td>Deploying WAF managed ruleset (Step 7)</td></tr>
+    <tr><td>Zone</td><td>Cache Rules</td><td><span class="badge badge-edit">Edit</span></td><td>Creating cache rules via Rulesets API (Step 8)</td></tr>
+    <tr><td>Zone</td><td>Logs</td><td><span class="badge badge-edit">Edit</span></td><td>Logpush jobs + log retention (Steps 6, 9–12)</td></tr>
+    <tr><td>Account</td><td>Account Settings</td><td><span class="badge badge-read">Read</span></td><td>Account ID validation for zone creation (Step 1)</td></tr>
+  </tbody>
+</table>
+
+<h3>How to create the token</h3>
+<ol>
+  <li>Go to <strong>Cloudflare Dashboard → My Profile → API Tokens</strong></li>
+  <li>Click <strong>Create Token → Custom Token</strong></li>
+  <li>Add all permissions from the table above</li>
+  <li>Under <em>Zone Resources</em>: select <strong>All zones</strong> or specific zones in your account</li>
+  <li>Under <em>Account Resources</em>: select your account for Account Settings Read</li>
+  <li>Click <strong>Continue to Summary → Create Token</strong></li>
+  <li>Copy the token immediately — it is shown only once</li>
+</ol>
+
+<div class="callout callout-danger">
+  <strong>Security: never commit credentials.txt to source control.</strong>
+  Add <code>credentials.txt</code> to your <code>.gitignore</code>. The <code>credentials.txt.example</code> file is safe to commit.
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="credentials">4. credentials.txt Format</h2>
+
+<p>Create a file named <code>credentials.txt</code> in the same directory as the script. One key per line, <code>KEY=VALUE</code> with no spaces around <code>=</code>.</p>
+
+<pre>CLOUDFLARE_API_TOKEN=your-cloudflare-bearer-token
+CLOUDFLARE_ACCOUNT_ID=your-account-id
+SPLUNK_URL=https://your-splunk-instance:8088/services/collector/raw
+SPLUNK_TOKEN=Splunk your-hec-token-here
+DYNATRACE_URL=https://your-environment-id.live.dynatrace.com/api/v2/logs/ingest?header_Authorization=Api-Token%20your-dynatrace-token-here</pre>
+
+<table>
+  <thead>
+    <tr><th>Key</th><th>Description</th><th>Example / Notes</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>CLOUDFLARE_API_TOKEN</code></td>
+      <td>Cloudflare API Bearer token</td>
+      <td>Generated from My Profile → API Tokens. No prefix needed.</td>
+    </tr>
+    <tr>
+      <td><code>CLOUDFLARE_ACCOUNT_ID</code></td>
+      <td>Your Cloudflare account ID</td>
+      <td>Found in the dashboard URL: <code>/accounts/{account_id}</code></td>
+    </tr>
+    <tr>
+      <td><code>SPLUNK_URL</code></td>
+      <td>Full HEC endpoint URL including scheme</td>
+      <td>Must use <code>/services/collector/raw</code> path. Port must be <code>:443</code> or <code>:8088</code>.</td>
+    </tr>
+    <tr>
+      <td><code>SPLUNK_TOKEN</code></td>
+      <td>Splunk HEC token with <code>Splunk</code> prefix</td>
+      <td>Must be <code>Splunk abc123...</code> — the word "Splunk" followed by a space and the token.</td>
+    </tr>
+    <tr>
+      <td><code>DYNATRACE_URL</code></td>
+      <td>Full Dynatrace log ingest URL with the API token embedded as a query parameter</td>
+      <td><code>https://{env-id}.live.dynatrace.com/api/v2/logs/ingest?header_Authorization=Api-Token%20dt0c01.xxx</code> — token requires <code>logs.ingest</code> scope. The space between <code>Api-Token</code> and the token value must be percent-encoded as <code>%20</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout callout-info">
+  <strong>Splunk channel IDs are auto-generated.</strong>
+  The script generates a unique UUID for each of the three Splunk Logpush jobs at runtime using Python's <code>uuid.uuid4()</code>. You do not need to pre-create these.
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="usage">5. Script Usage</h2>
+
+<h3>Install dependency</h3>
+<pre>pip install requests</pre>
+
+<h3>Run the script</h3>
+<pre><span class="comment"># A record (IP origin)</span>
+python cloudflare_zone_setup.py \
+  --zone example.com \
+  --record-type A \
+  --origin 1.2.3.4
+
+<span class="comment"># CNAME record (hostname origin)</span>
+python cloudflare_zone_setup.py \
+  --zone example.com \
+  --record-type CNAME \
+  --origin origin.example.com</pre>
+
+<h3>Arguments</h3>
+<table>
+  <thead>
+    <tr><th>Argument</th><th>Required</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>--zone</code></td><td>Yes</td><td>The domain name to create, e.g. <code>example.com</code></td></tr>
+    <tr><td><code>--record-type</code></td><td>Yes</td><td><code>A</code> or <code>CNAME</code></td></tr>
+    <tr><td><code>--origin</code></td><td>Yes</td><td>IP address (for A) or hostname (for CNAME)</td></tr>
+  </tbody>
+</table>
+
+<h3>Expected output</h3>
+<pre>══════════════════════════════════════════════════════════════════
+[STEP 1/12] Creating Zone: example.com
+══════════════════════════════════════════════════════════════════
+✓ SUCCESS: Zone created: example.com (ID: abc123def456...)
+
+[STEP 2/12] Creating A DNS Record → 1.2.3.4
+...
+✓ ALL 12 STEPS COMPLETED SUCCESSFULLY
+  Zone:    example.com
+  Zone ID: abc123def456...
+
+HTML Report generated: zone_report_example.com_20260512_143022.html</pre>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="steps">6. Step-by-Step Walkthrough</h2>
+
+<!-- Step 1 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">1</div>
+    <div class="step-title">Create Zone</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-post">POST</span>https://api.cloudflare.com/client/v4/zones</div>
+  <p>Creates the zone under your account with <code>type: full</code>, meaning Cloudflare is the authoritative DNS. The Enterprise plan is inherited from the account — it is not specified in the API payload. <code>jump_start: false</code> prevents Cloudflare from auto-scanning existing DNS records.</p>
+  <p><strong>On success:</strong> saves <code>result.id</code> as <code>ZONE_ID</code>, used by all subsequent steps.</p>
+  <p><strong>On failure:</strong> no rollback needed (zone was not created), exits immediately.</p>
+</div>
+
+<!-- Step 2 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">2</div>
+    <div class="step-title">Create DNS Record</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-post">POST</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records</div>
+  <p>Creates a proxied A or CNAME record for the root domain. <code>proxied: true</code> is mandatory — WAF, Logpush, and all Cloudflare security features only apply to traffic passing through the Cloudflare proxy. TTL is set to <code>1</code> (Auto) which Cloudflare enforces for all proxied records.</p>
+</div>
+
+<!-- Step 3 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">3</div>
+    <div class="step-title">Set Minimum TLS Version to 1.2</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-patch">PATCH</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/settings/min_tls_version</div>
+  <p>Rejects any HTTPS connections using TLS 1.0 or 1.1. Valid values: <code>"1.0"</code>, <code>"1.1"</code>, <code>"1.2"</code>, <code>"1.3"</code>. This is a zone-level setting that applies to all hostnames in the zone.</p>
+</div>
+
+<!-- Step 4 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">4</div>
+    <div class="step-title">Disable HTTP/2 (Client → Edge)</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-patch">PATCH</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/settings/http2</div>
+  <p>Disables HTTP/2 between clients and the Cloudflare edge. The documented API value is the string <code>"off"</code> — not the boolean <code>false</code>. This does not affect HTTP/2 from Cloudflare to the origin server.</p>
+</div>
+
+<!-- Step 5 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">5</div>
+    <div class="step-title">Set Origin Read Timeout to 120 Seconds</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-patch">PATCH</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/settings/proxy_read_timeout</div>
+  <p><strong>Enterprise-only setting.</strong> Controls the maximum time Cloudflare waits for the origin to send a response after establishing a TCP connection. Default is 100 seconds. Valid range: 1–6000 seconds. Set to <code>120</code> as an integer (not a string).</p>
+</div>
+
+<!-- Step 6 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">6</div>
+    <div class="step-title">Enable Log Retention</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-put">PUT</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/logs/received/settings</div>
+  <p>Requires the <strong>Logpull entitlement</strong> (Enterprise). Retains HTTP request logs for up to 72 hours, queryable via the Logpull API (<code>GET /zones/{id}/logs/received</code>). This is separate from Logpush — Logpull lets you pull historical logs on demand.</p>
+</div>
+
+<!-- Step 7 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">7</div>
+    <div class="step-title">Deploy WAF Managed Ruleset in Log Mode</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-put">PUT</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/rulesets/phases/http_request_firewall_managed/entrypoint</div>
+  <p>Deploys the Cloudflare Managed Ruleset (<code>efb7b8c949ac4650a09736fc376e9aee</code>) in log-only mode. The <code>overrides.rulesets[].action: "log"</code> structure overrides every rule in the ruleset to log instead of block. Available actions: <code>block</code>, <code>log</code>, <code>managed_challenge</code>, <code>challenge</code>.</p>
+  <div class="callout callout-info">
+    <strong>OWASP ruleset is not deployed.</strong> The OWASP Core Ruleset must be explicitly added as a separate rule in the same phase entrypoint if needed. This script only deploys the Cloudflare Managed Ruleset.
+  </div>
+</div>
+
+<!-- Step 8 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">8</div>
+    <div class="step-title">Cache Rule — Disable All Caching</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-put">PUT</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/rulesets/phases/http_request_cache_settings/entrypoint</div>
+  <p>Uses the <code>http_request_cache_settings</code> phase to create a cache rule. <code>"cache": false</code> disables caching for all matched requests. <code>"expression": "true"</code> is the Rules Language expression that matches every request.</p>
+</div>
+
+<!-- Step 9 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">9</div>
+    <div class="step-title">Logpush Job: HTTP Requests → Splunk</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-post">POST</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/logpush/jobs</div>
+  <p>Creates a Logpush job streaming HTTP request logs to Splunk HEC. Uses <code>output_options.field_names</code> array (current API approach, not the deprecated <code>logpull_options</code> string). A unique UUID channel ID is generated at runtime. The <code>destination_conf</code> uses the <code>splunk://</code> scheme with the HEC endpoint stripped of its <code>https://</code> prefix.</p>
+  <p>Endpoint must be <code>/services/collector/raw</code>. Supported ports: <code>:443</code> or <code>:8088</code>.</p>
+</div>
+
+<!-- Step 10 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">10</div>
+    <div class="step-title">Logpush Job: Firewall Events → Splunk</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-post">POST</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/logpush/jobs</div>
+  <p>Streams firewall event logs (WAF actions, rate limiting, etc.) to Splunk using <code>dataset: "firewall_events"</code>. Uses a separate unique UUID channel ID. Includes <code>FraudUserID</code> field (added May 2026).</p>
+</div>
+
+<!-- Step 11 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">11</div>
+    <div class="step-title">Logpush Job: DNS Logs → Splunk</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-post">POST</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/logpush/jobs</div>
+  <p>Streams DNS query logs to Splunk using <code>dataset: "dns_logs"</code>. DNS logs are only available if the zone has active DNS traffic flowing through Cloudflare (requires proxied records and nameserver delegation).</p>
+</div>
+
+<!-- Step 12 -->
+<div class="step-card">
+  <div class="step-header">
+    <div class="step-num">12</div>
+    <div class="step-title">Logpush Job: HTTP Requests → Dynatrace</div>
+  </div>
+  <div class="step-endpoint"><span class="method method-post">POST</span>https://api.cloudflare.com/client/v4/zones/{zone_id}/logpush/jobs</div>
+  <p>Streams a selected subset of HTTP request fields to Dynatrace Log Monitoring. Dynatrace requires <code>output_type: "ndjson"</code> with <code>batch_prefix: "["</code>, <code>batch_suffix: "]"</code>, and <code>record_delimiter: ","</code> so that log batches are delivered as JSON arrays. The token must be prefixed with <code>Api-Token</code> and must have the <code>logs.ingest</code> scope.</p>
+  <p>The field list in the script is clearly marked with a comment for customisation. Full field reference: <a href="https://developers.cloudflare.com/logs/reference/log-fields/zone/http_requests/" target="_blank">Cloudflare HTTP Requests log fields</a>.</p>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="rollback">7. Rollback Behaviour</h2>
+
+<p>If any step fails (Cloudflare API returns <code>"success": false</code>), the script:</p>
+<ol>
+  <li>Logs the full API error response to the terminal</li>
+  <li>Sets the overall status to <code>FAILED</code></li>
+  <li>Calls <code>DELETE /zones/{zone_id}</code> to remove the partially-configured zone</li>
+  <li>Generates the HTML report (including rollback status)</li>
+  <li>Exits with code <code>1</code></li>
+</ol>
+
+<div class="callout callout-warn">
+  <strong>Rollback deletes the zone entirely.</strong>
+  All DNS records, settings, WAF rules, and Logpush jobs created before the failure point are removed along with the zone. This is intentional — a partial configuration is worse than no configuration.
+</div>
+
+<h3>What rollback does NOT cover</h3>
+<ul>
+  <li>Step 1 failure — if zone creation itself fails, there is nothing to roll back</li>
+  <li>Registrar-level nameserver changes you may have already made manually</li>
+</ul>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="report">8. HTML Report</h2>
+
+<p>The script generates <code>zone_report_{zone}_{timestamp}.html</code> in the script directory on both success and failure.</p>
+
+<h3>Report sections</h3>
+<ul>
+  <li><strong>Header</strong> — zone name, zone ID, record type, origin, timestamp, and overall status badge (green for SUCCESS, red for FAILED)</li>
+  <li><strong>Step Summary table</strong> — one row per step showing status (✓ / ✗ / —), API endpoint, and resource ID</li>
+  <li><strong>Step Details</strong> — collapsible <code>&lt;details&gt;</code> element for each step showing the full raw API response JSON</li>
+  <li><strong>Error Details</strong> (on failure) — highlighted section with the API error response that caused the failure</li>
+  <li><strong>Rollback section</strong> (if triggered) — shows rollback status and the DELETE API response</li>
+</ul>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="limitations">9. Known Limitations</h2>
+
+<table>
+  <thead>
+    <tr><th>Limitation</th><th>Details</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Maximum 4 Logpush jobs per zone</td>
+      <td>This script creates exactly 4 (the maximum). Adding more Logpush jobs without deleting existing ones will fail. The script warns you before creating jobs.</td>
+    </tr>
+    <tr>
+      <td>NS delegation is manual</td>
+      <td>Zone creation via API does not activate the zone. Nameserver updates at the registrar are required and cannot be automated via Cloudflare API.</td>
+    </tr>
+    <tr>
+      <td>Enterprise plan required</td>
+      <td><code>proxy_read_timeout</code> and Logpull are Enterprise-only features. The Enterprise plan must be pre-assigned by Cloudflare and cannot be set via API.</td>
+    </tr>
+    <tr>
+      <td>Logpull entitlement required</td>
+      <td>Step 6 (log retention) will fail if the account does not have the Logpull entitlement. Contact your Cloudflare account team to enable it.</td>
+    </tr>
+    <tr>
+      <td>DNS logs require active traffic</td>
+      <td>The Logpush DNS logs job (Step 11) only produces data once the zone is active (nameservers delegated) and receiving DNS queries.</td>
+    </tr>
+    <tr>
+      <td>OWASP ruleset not included</td>
+      <td>The OWASP Core Ruleset is not deployed. It must be added separately with its own execute rule in the WAF phase entrypoint.</td>
+    </tr>
+    <tr>
+      <td>Single root record only</td>
+      <td>The script creates one DNS record for the root domain. Additional records (www, subdomains) must be added separately.</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ─────────────────────────────────────────────────────────────── -->
+<h2 id="troubleshooting">10. Troubleshooting</h2>
+
+<table>
+  <thead>
+    <tr><th>Error / Symptom</th><th>Cause</th><th>Fix</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>1001</code> — Invalid API token</td>
+      <td>Token is malformed, expired, or lacks required permissions</td>
+      <td>Recreate the token with all permissions in <a href="#permissions">Section 3</a></td>
+    </tr>
+    <tr>
+      <td><code>1061</code> — Zone already exists</td>
+      <td>The domain is already registered in Cloudflare (in this or another account)</td>
+      <td>Delete or move the existing zone before running the script</td>
+    </tr>
+    <tr>
+      <td><code>7003</code> — Invalid value for field "type"</td>
+      <td>Only <code>"full"</code> and <code>"partial"</code> are valid zone types</td>
+      <td>Ensure the body is exactly as specified — no modifications</td>
+    </tr>
+    <tr>
+      <td>Step 5 fails — <code>proxy_read_timeout</code> not available</td>
+      <td>Zone is not on an Enterprise plan</td>
+      <td>Contact your Cloudflare account team to verify Enterprise entitlements</td>
+    </tr>
+    <tr>
+      <td>Step 6 fails — log retention not available</td>
+      <td>Logpull entitlement not enabled on the account</td>
+      <td>Contact Cloudflare support to enable the Logpull entitlement</td>
+    </tr>
+    <tr>
+      <td>Step 9–12 fail — <code>1009</code> max Logpush jobs reached</td>
+      <td>Zone already has 4 Logpush jobs from a previous run</td>
+      <td>Delete existing jobs via <code>DELETE /zones/{id}/logpush/jobs/{job_id}</code> then re-run</td>
+    </tr>
+    <tr>
+      <td>Splunk Logpush job created but no data arrives</td>
+      <td>HEC token inactive, wrong endpoint, or zone not yet active</td>
+      <td>Verify HEC token is enabled in Splunk, endpoint is <code>/services/collector/raw</code>, and nameservers are delegated</td>
+    </tr>
+    <tr>
+      <td>Dynatrace Logpush job created but data is not parsed as JSON</td>
+      <td>Missing <code>output_type: ndjson</code> + batch options</td>
+      <td>Ensure the job body includes <code>output_type</code>, <code>batch_prefix</code>, <code>batch_suffix</code>, and <code>record_delimiter</code> exactly as specified</td>
+    </tr>
+    <tr>
+      <td><code>requests.exceptions.ConnectionError</code></td>
+      <td>No network access to <code>api.cloudflare.com</code></td>
+      <td>Check firewall/proxy settings; ensure outbound HTTPS to <code>api.cloudflare.com:443</code> is allowed</td>
+    </tr>
+    <tr>
+      <td>Missing credential error on startup</td>
+      <td><code>credentials.txt</code> is missing a required key</td>
+      <td>Check against <a href="#credentials">Section 4</a> — all six keys must be present with non-empty values</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr>
+<p style="color:#8b949e; font-size:0.82rem; margin-top:24px;">
+  All API calls verified against <a href="https://developers.cloudflare.com/api" target="_blank">developers.cloudflare.com/api</a>.
+  WAF Managed Ruleset ID sourced from <a href="https://developers.cloudflare.com/waf/managed-rules/reference/cloudflare-managed-ruleset/" target="_blank">Cloudflare WAF Managed Rules reference</a>.
+</p>
+
+</main>
+</div>
+
+<script>
+  // Highlight active nav link based on scroll position
+  const sections = document.querySelectorAll('h2[id]');
+  const navLinks = document.querySelectorAll('nav a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 80) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>
